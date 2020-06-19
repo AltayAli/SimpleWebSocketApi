@@ -1,0 +1,56 @@
+﻿@{
+    ViewData["Title"] = "Privacy Policy";
+}
+<h1>@ViewData["Title"]</h1>
+<input type="text" name="name" id="email" value="@ViewBag.Email" hidden />
+<input type="text" name="name" id="data" value="@ViewBag.Data" hidden />
+<p>Use this page to detail your site's privacy policy.</p>
+@section Scripts{
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+    <script>
+
+        $(document).ready(() => {
+            var obj = {
+                Email: $("#email").val(),
+                Platform: $("#data").val()
+
+            }
+            var socket = new WebSocket("wss://localhost:44336/ws");
+            socket.onopen = function (e) {
+                console.log("[open] Connection established");
+                
+            console.log("Sending to server");
+            console.log("oj" + JSON.stringify(obj))
+            socket.send(JSON.stringify(obj));
+
+              
+            };
+
+            socket.onmessage = function (event) {
+                console.log(`[message] Data received from server: ${event.data}`);
+
+
+                if (event.data == "0") {
+                    swal({
+                        title: "Basqa cihazdan giris var!",
+                        text: "Burda istifade et!",
+                        icon: "warning",
+                        buttons: true,
+                        dangerMode: true,
+                    }).then((willDelete) => {
+                        if (willDelete) {
+                            socket.send(JSON.stringify(obj));
+                        } else {
+
+                            window.location.replace(window.location.origin);
+                        }
+                    });
+                }
+            };
+
+        })
+
+    </script>
+
+}
